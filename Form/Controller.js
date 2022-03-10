@@ -11,7 +11,7 @@ export class FCController {
     static #D = false;
     static #nameList = {};
     static #NotActive = () => {
-        let elm = document.createElement('div');
+        const elm = document.createElement('div');
         elm.appendChild(document.createElement('form'));
         return new FCBase(elm);
     };
@@ -53,7 +53,7 @@ export class FCController {
         if (key.length == 0 || this.#fcCol.has(key)) {
             throw new TypeError('append');
         }
-        let fc = this.#genFC(type, parentNode, noStat);
+        const fc = this.#genFC(type, parentNode, noStat);
         this.#fcCol.set(key, fc);
         return fc;
     }
@@ -70,33 +70,33 @@ export class FCController {
 
     #viewNext(fc, list, from, errMessage) {
         if (fc instanceof FCBase == false) { throw new TypeError(from); }
-        let index = list.indexOf(fc);
+        const index = list.indexOf(fc);
         if (index == -1) { throw new FCNotExistsExeption('next'); }
         if (index + 1 == list.length) { throw new Error(errMessage); }
         list[index + 1].view();        
     }
     next (fc) {
-        let list = Array.from(this.#fcCol.values());
+        const list = Array.from(this.#fcCol.values());
         this.#viewNext(fc, list, 'next', 'Target is last element.');
     }
     back (fc) {
-        let list = Array.from(this.#fcCol.values()).reverse();
+        const list = Array.from(this.#fcCol.values()).reverse();
         this.#viewNext(fc, list, 'back', 'Target is first element.');
     }
     getKey(fc) {
         if (fc instanceof FCBase == false) { throw new TypeError('getKey'); }
-        let result = Array.from(this.#fcCol.entries()).find(target => target[1] === fc);
+        const result = Array.from(this.#fcCol.entries()).find(target => target[1] === fc);
         if (result == undefined) { throw new FCNotExistsExeption('getKey'); }
         return result[0];
     }
     #genFC (type, parentNode, noStat) {
-        let fc = new type(parentNode);
+        const fc = new type(parentNode);
         if (fc instanceof FCBase == false) { TypeError('"type" is not instance of FCBase.'); }
         fc.addEventList('beforeView', this.#genDefaultBeforeView(noStat));
         return fc;
     }
     #genDefaultBeforeView (noStat) {
-        let ctr = this;
+        const ctr = this;
         return myFc => {
             setTimeout(() => ctr.scroll(), 1);
             if (this.#multiView == false && ctr.#active !== FCController.#NotActive) {
@@ -109,13 +109,12 @@ export class FCController {
     }
 
     setData (key) {
-        let fc = this.get(key); //let fc = new FCForm();
-        let flg = false;
+        const fc = this.get(key); //let fc = new FCForm();
         this.#data.set(key, fc.getCollectedFormData());
         if (this.#useIdb == false) { return; }
 
-        let [tran, store] = this.#idb.transaction('readwrite');
-        let req = store.put({ page : key, formData : this.#genSimpleObj(fc.getCollectedFormData())});
+        const [, store] = this.#idb.transaction('readwrite');
+        const req = store.put({ page : key, formData : this.#genSimpleObj(fc.getCollectedFormData())});
         req.addEventListener('error', event => {
             throw req.error;
         });
@@ -126,7 +125,7 @@ export class FCController {
         return this.#data.get(key);
     }
     getAllData () {
-        let newData = new FormData();
+        const newData = new FormData();
         this.#data.forEach( data => {
             data.forEach((v, k) => newData.append(k, v) );
         });
@@ -143,7 +142,7 @@ export class FCController {
     }
     #initExpires () {
         if (this.#expires <= 0) { return; }
-        let strExpires = sessionStorage.getItem(this.#keyExpires);
+        const strExpires = sessionStorage.getItem(this.#keyExpires);
         if (strExpires == '' || strExpires == 0 || strExpires == null) {
             sessionStorage.setItem(this.#keyExpires, Number(new Date()) + (this.#expires * 1000));
         }
@@ -159,9 +158,9 @@ export class FCController {
         return new Date( Number(sessionStorage.getItem(this.#keyExpires)) );
     }
     get remainingTime () {
-        let strExpires = sessionStorage.getItem(this.#keyExpires);
+        const strExpires = sessionStorage.getItem(this.#keyExpires);
         if (strExpires == 0) { return 0; }
-        let miriSec = Number(strExpires) - Number(new Date());
+        const miriSec = Number(strExpires) - Number(new Date());
         return miriSec / 1000;
     }
     updateExpires () {
@@ -179,18 +178,18 @@ export class FCController {
         if (FCController.#D) console.log(`genPrLoadFormData, key: ${key}`);
         return new Promise( (resolve, reject) =>{
             if (FCController.#D) console.log(`exec Promise, key: ${key}`);
-            let req = store.get(key);
+            const req = store.get(key);
             req.addEventListener('error', event => {
                 reject(req);
             });
             req.addEventListener('success', event => {
-                let fc = this.#fcCol.get(key);
+                const fc = this.#fcCol.get(key);
                 if (req.result != undefined) {
                     fc.clearValues();
                     fc.setValues(req.result.formData);
                     if (FCController.#D) console.log(`success! ${key}`);
                 }
-                let data = fc.getCollectedFormData();
+                const data = fc.getCollectedFormData();
                 this.#data.set(key, data);
                 resolve(req);
             });
@@ -202,9 +201,9 @@ export class FCController {
             return this.#startNoUseIdb();
         }
         try {
-            let idbReq = await this.#idb.open();
-            let promises = [];
-            let [tran, store] = this.#idb.transaction('readonly');
+            const idbReq = await this.#idb.open();
+            const promises = [];
+            const [tran, store] = this.#idb.transaction('readonly');
             this.#fcCol.forEach((fc, key) => {
                 promises.push(this.#genPromiseLoadFormDatas(tran, store, key));
             });
@@ -267,7 +266,7 @@ export class FCController {
         clearTimeout(this.#stoID);
     }
     #isExpires () {
-        let expires = sessionStorage.getItem(this.#keyExpires);
+        const expires = sessionStorage.getItem(this.#keyExpires);
         if (!expires) { return false; }
         return expires <= Number(new Date()) ? true : false;
     }
@@ -277,8 +276,8 @@ export class FCController {
         this.expires = this.expires;
     }
     #firstView () {
-        let key = sessionStorage.getItem(this.#keyStat);
-        let fcMap = this.#fcCol;
+        const key = sessionStorage.getItem(this.#keyStat);
+        const fcMap = this.#fcCol;
         if (fcMap.has(key)) {
             fcMap.get(key).view();
         } else {
@@ -294,12 +293,12 @@ export class FCController {
         }
     }
     #setTimerExpires () {
-        let timeout = Number(sessionStorage.getItem(this.#keyExpires)) - Number(new Date());
+        const timeout = Number(sessionStorage.getItem(this.#keyExpires)) - Number(new Date());
         if (this.#stoID != undefined) {
             clearTimeout(this.#stoID);
             this.#stoID == undefined;
         }
-        let ctr = this;
+        const ctr = this;
         this.#stoID = setTimeout(() => {
             clearTimeout(this.#stoID);
             this.#stoID == undefined;
@@ -313,9 +312,7 @@ export class FCController {
         }, false);
     }
     clearValues () {
-        for (let fc of this.#fcCol.values()) {
-            fc.clearValues();
-        }
+        this.#fcCol.forEach(fc => fc.clearValues());
     }
     scroll (xCoord = 0, yCoord = 0) {
         try {
@@ -326,8 +323,8 @@ export class FCController {
     }
 
     #idbSetting () {
-        let version = 1;
-        let idb = new IDB(this.#keyIdbName, version);
+        const version = 1;
+        const idb = new IDB(this.#keyIdbName, version);
         idb.storeSettings(this.#keyIdbStore, { keyPath : 'page' }, store => {
             store.createIndex('formData', 'formData', {unique : false});
         });
@@ -335,11 +332,10 @@ export class FCController {
     }
 
     #updateDB () {
-        let promises = [];
-        let [tran, store] = this.#idb.transaction('readwrite');
+        const [, store] = this.#idb.transaction('readwrite');
         this.#fcCol.forEach((fc, key) => {
-            let data = (this.isConfirm ? this.getData(key) : fc.getCollectedFormData());
-            let req = store.put({ page : key, formData : this.#genSimpleObj(data)});
+            const data = (this.isConfirm ? this.getData(key) : fc.getCollectedFormData());
+            const req = store.put({ page : key, formData : this.#genSimpleObj(data)});
             req.addEventListener('error', event => {
                 console.error(req.error);
             });
@@ -351,7 +347,7 @@ export class FCController {
         addEventListener('beforeunload', this.#cbfUploadDb);
     }
     #genSimpleObj (formData) {
-        let obj = {};
+        const obj = {};
         formData.forEach((value, key) => {
             obj[key] = formData.getAll(key);
         });
