@@ -109,16 +109,16 @@ export class FCController {
     }
 
     setData (key) {
-        const fc = this.get(key); //let fc = new FCForm();
+        const fc = this.get(key);
         this.#data.set(key, fc.getCollectedFormData());
         if (this.#useIdb == false) { return; }
 
-        const [, store] = this.#idb.transaction('readwrite');
-        const req = store.put({ page : key, formData : this.#genSimpleObj(fc.getCollectedFormData())});
-        req.addEventListener('error', event => {
-            throw req.error;
+        const pr = this.#idb.put({
+            page : key,
+            formData : this.#genSimpleObj(fc.getCollectedFormData())
         });
-        if (FCController.#D) req.addEventListener('success', event => { console.log('setData(db) success'); });
+        pr.catch(([req, ]) => { throw req.error; });
+        if (FCController.#D) { pr.then(() => { console.log('setData(db) success'); }); }
     }
     getData (key) {
         if (this.#data.has(key) == false) { throw new FCNotExistsExeption(`getData, key: ${key}`); }
@@ -174,15 +174,12 @@ export class FCController {
     get isConfirm () {
         return sessionStorage.getItem(this.#keyIsConfirm) == '1' ? true : false;
     }
-    #genPromiseLoadFormDatas (tran, store, key) {
+    #genPromiseLoadFormDatas (key) {
         if (FCController.#D) console.log(`genPrLoadFormData, key: ${key}`);
         return new Promise( (resolve, reject) =>{
             if (FCController.#D) console.log(`exec Promise, key: ${key}`);
-            const req = store.get(key);
-            req.addEventListener('error', event => {
-                reject(req);
-            });
-            req.addEventListener('success', event => {
+            this.#idb.get(key)
+            .then(([req, ]) => {
                 const fc = this.#fcCol.get(key);
                 if (req.result != undefined) {
                     fc.clearValues();
@@ -192,7 +189,8 @@ export class FCController {
                 const data = fc.getCollectedFormData();
                 this.#data.set(key, data);
                 resolve(req);
-            });
+            })
+            .catch(() => { reject(req); });
         } );
     }
 
@@ -203,9 +201,8 @@ export class FCController {
         try {
             const idbReq = await this.#idb.open();
             const promises = [];
-            const [tran, store] = this.#idb.transaction('readonly');
             this.#fcCol.forEach((fc, key) => {
-                promises.push(this.#genPromiseLoadFormDatas(tran, store, key));
+                promises.push(this.#genPromiseLoadFormDatas(key));
             });
             await Promise.allSettled(promises);
             this.#initExpires();
@@ -323,8 +320,7 @@ export class FCController {
     }
 
     #idbSetting () {
-        const version = 1;
-        const idb = new IDB(this.#keyIdbName, version);
+        const idb = new IDB(this.#keyIdbName, 1);
         idb.storeSettings(this.#keyIdbStore, { keyPath : 'page' }, store => {
             store.createIndex('formData', 'formData', {unique : false});
         });
@@ -332,14 +328,14 @@ export class FCController {
     }
 
     #updateDB () {
-        const [, store] = this.#idb.transaction('readwrite');
         this.#fcCol.forEach((fc, key) => {
             const data = (this.isConfirm ? this.getData(key) : fc.getCollectedFormData());
-            const req = store.put({ page : key, formData : this.#genSimpleObj(data)});
-            req.addEventListener('error', event => {
-                console.error(req.error);
+            const pr = this.#idb.put({
+                page : key,
+                formData : this.#genSimpleObj(data)
             });
-            if (FCController.#D) req.addEventListener('success', event => { console.log('success updateDB'); });
+            pr.catch(([req, ]) => { console.error(req.error); });
+            if (FCController.#D) pr.then(() => { onsole.log('success updateDB'); });
         });
     }
     #addIDBEvent () {
