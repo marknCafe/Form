@@ -29,11 +29,12 @@ export class FCController {
     #stoID = undefined;
 
     #idb = undefined;
+    #useIdb = true;
 
     #cbfUploadDb = undefined;
     #siID = undefined;
 
-    constructor (name) {
+    constructor (name, useIdb = true) {
         if (!name) { throw new TypeError('"name" is not defined.'); }
         if (name in FCController.#nameList) { throw new TypeError('"name" is already in use.'); }
         FCController.#nameList[name] = true;
@@ -45,7 +46,8 @@ export class FCController {
 
         this.#fcCol = new Map();
         this.#data = new Map ();
-        this.#idbSetting();
+        this.#useIdb = useIdb;
+        if (useIdb) { this.#idbSetting(); }
     }
     append(key, type, parentNode, noStat) {
         if (key.length == 0 || this.#fcCol.has(key)) {
@@ -110,6 +112,7 @@ export class FCController {
         let fc = this.get(key); //let fc = new FCForm();
         let flg = false;
         this.#data.set(key, fc.getCollectedFormData());
+        if (this.#useIdb == false) { return; }
 
         let [tran, store] = this.#idb.transaction('readwrite');
         let req = store.put({ page : key, formData : this.#genSimpleObj(fc.getCollectedFormData())});
@@ -195,6 +198,9 @@ export class FCController {
     }
 
     async start () {
+        if (this.#useIdb == false) {
+            return this.#startNoUseIdb();
+        }
         try {
             let idbReq = await this.#idb.open();
             let promises = [];
@@ -224,6 +230,18 @@ export class FCController {
             }
         }
     }
+    async #startNoUseIdb () {
+        try {
+            this.#fcCol.forEach((fc, key) => this.setData(key) );
+            this.#initExpires();
+            this.#checkExpires();
+            this.hideAll();
+            this.#firstView();
+            return;
+        } catch (reason) {
+            throw reason instanceof Error ? reason : new Error(reason);
+        }
+    }
 
     clear () { this.#tryClear(); }
     #tryClear() {
@@ -238,6 +256,7 @@ export class FCController {
 
         this.clearValues();
         sessionStorage.clear();
+        if (this.#useIdb == false) { return; }
         if (this.#idb.hasDb) {
             this.#idb.db.close();
             this.#idb.delete();
