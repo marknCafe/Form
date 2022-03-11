@@ -5,6 +5,7 @@ Webフォームのクライアントサイドの制御を簡単に行うため�
 * 複数の`form`要素を各フォーム画面と見立てたシングルページアプリケーションを実現します。
 * いくつかのJavaScriptコーディングと、HTMLは`input`要素等の属性や、少しだけ用意されたルールに沿った`class`属性を追加するだけで、クライアントサイドの有効性検査と、検査結果を表示、"次へ"、"戻る"ボタンの基本的な機能を付与、確認画面の値の表示を行います。
 * エラーメッセージは専用のテンプレートを調整して、項目に応じたメッセージを表示可能です。
+* リロードをされてもフォームの内容を維持するためにIndexedDBを使用しています。尚、IndexedDBの使用は選択可能です。IndexedDBを使用しない場合は、ブラウザの設定によりリロード時にフォームの内容が保持できない場合があります。
 * かっこいいスタイルシートは各自で用意してください。
 
 ## Instration
@@ -12,6 +13,8 @@ Webフォームのクライアントサイドの制御を簡単に行うため�
 Form.jsと関連するFormフォルダをWebサーバに配置して、Form.jsを利用するJavaScriptから`import`してください。
 
 ## Example
+
+<p><a href="https://markncafe.github.io/sample/form/example.html" target="_blank">example.html</a></p>
 
 ``` html:example.html
 <!-- example.html -->
@@ -22,11 +25,10 @@ Form.jsと関連するFormフォルダをWebサーバに配置して、Form.js�
 <title>example</title>
 <script src="js/example.js" type="module"></script>
 <style>
-.hide { display:none; }
-.view { display:inherit; }
+.hidden { display:none; }
 </style>
 </head>
-<body class="hide"><!-- スタイルを一切気にしないでコーディングしています。 -->
+<body class="hidden"><!-- スタイルを一切気にしないでコーディングしています。 -->
 
 <div class="form">
 <form method="post" action="#">
@@ -92,6 +94,9 @@ Form.jsと関連するFormフォルダをWebサーバに配置して、Form.js�
 </body>
 </html>
 ```
+
+example.js
+
 ``` javascript:expample.js
 /* js/example.js
  * js フォルダ内に必要なパッケージがある前提です。
@@ -100,7 +105,7 @@ import { Form, FCType, VMType } from './Form.js';
 
 const form = new Form('form1'); // startメソッド以外はチェーンメソッド可能です。
 form.controllerSettings({ //　内包するコントローラクラスの設定
-    expires : 30 // フォームの有効期限（秒）
+    expires : 30 // コンテンツの有効期限（秒）
 })
 .formSettings({ // FCType.Form の設定
     delayTime : 1000, // inputイベント発火の遅延時間設定（ミリ秒）
@@ -131,5 +136,5 @@ form.controllerSettings({ //　内包するコントローラクラスの設定
     fc.addCondRequire('hobby-etc', 'hobby', 3, 'その他の内容を入力してください。'); // 条件付き必須の定義
 })
 .start() // 機能開始。append -> addInitTaskの順にwindow.onloadイベントとして実行します。
-.then(() => { document.body.classList.remove('hide'); }) // start()の戻り値はPromiseインスタンスなので、then catch が利用できます。
+.then(() => { document.body.classList.remove('hidden'); }) // start()の戻り値はPromiseインスタンスなので、then catch が利用できます。
 ```
