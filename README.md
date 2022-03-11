@@ -93,7 +93,8 @@ Form.jsと関連するFormフォルダをWebサーバに配置して、Form.js�
 </html>
 ```
 ``` javascript:expample.js
-/* example.js
+/* js/example.js
+ * js フォルダ内に必要なパッケージがある前提です。
  * 非対応のブラウザの処理は別途記述が必要です。 */
 import { Form, FCType, VMType } from './Form.js';
 
