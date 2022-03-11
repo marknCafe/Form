@@ -79,9 +79,6 @@ export class IDB {
         return [this.#tran, this.#store];
     }
 
-    static #getOnError = (event) => { throw event.target.error; }
-    static #getOnSuccess (event, key) { if (IDB.#D) console.log(`Success get method.(key: ${key})`); }
-
     #genPromise (req) {
         return new Promise((resolve, reject) => {
             req.addEventListener('error', event => reject([req, event]) );
@@ -95,26 +92,17 @@ export class IDB {
         return this.#genPromise(req);
     }
 
-    static #putOnError = IDB.#getOnError;
-    static #putOnSuccess = (event) => {  if (IDB.#D) console.log(`Success put method.`); }
-
     put (data = {}) {
         const [, store] = this.transaction('readwrite');
         const req = store.put(data);
         return this.#genPromise(req);
     }
 
-    static #clearOnError = IDB.#getOnError;
-    static #clearOnSuccess = (event, storeName) => { if (IDB.#D) console.log(`objectStore "${storeName}" is cleared.`); };
-
     clear () {
         const [, store] = this.transaction('readwrite');
         const req = store.clear();
         return this.#genPromise(req);
     }
-
-    static #deleteOnError = IDB.#getOnError;
-    static #deleteOnSuccess = (event, dbName) => { if (IDB.#D) console.log(`database "${dbName}" is deleted.`); };
 
     delete () {
         this.#db.close();
