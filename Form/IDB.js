@@ -10,7 +10,7 @@ export class IDB {
     #tran = undefined;
     #store = undefined;
 
-    constructor (dbName = new String(), version = 1) {
+    constructor (dbName = '', version = 1) {
         this.dbName = dbName;
         this.version = version;
     }
@@ -40,7 +40,7 @@ export class IDB {
         return this.#db instanceof IDBDatabase;
     }
 
-    storeSettings (storeName = new String(), option = { keyPath : '', autooIncrement : false}, cbFunc = store => {}) {
+    storeSettings (storeName = '', option = { keyPath : '', autooIncrement : false}, cbFunc = store => {}) {
         this.storeName = storeName;
         this.#storeSettings = db => {
             const store = db.createObjectStore(this.storeName, option);
