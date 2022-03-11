@@ -68,7 +68,7 @@ export class IDB {
     }
 
     transaction (mode) {
-        if (this.#tran == undefined) {
+        if (this.#tran == undefined || this.#tran.mode != mode) {
             this.#tran = this.#db.transaction(this.#storeName, mode);
             this.#tran.addEventListener('complete', event => {
                 this.#tran = undefined;
