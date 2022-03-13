@@ -253,11 +253,35 @@ export class FCForm extends FCBase {
         if (fc.#useWarnElm) {
             return fc.validationAll(event);
         } else {
-            const elms = fc.values();
-            const execP = fc.#genCbFuncVld(elms, event);
-            return execP(elms.next());
+            return fc.#validationStopFindInvalid(event);
         }
     }
+    async #validationStopFindInvalid (event) {
+        const promises = [];
+        const timer = new FCPromiseTimer(this.promiseTimeoutMiriSec, promises, 'validationStopFindInvalid');
+        timer.start();
+        let isValid = true;
+        try {
+            for (let elm of this.values()) {
+                const result = await this.#genPromiseVSFI(elm, event, promises);
+                if (result.isInvalid) {
+                    isValid = false;
+                    break;
+                }
+            }
+            timer.clear();
+            return isValid;
+        } catch (reason) {
+            timer.clear();
+            throw reason;
+        }
+    }
+    #genPromiseVSFI (elm, event, promises) {
+        const pr = this.validation(elm, false, event);
+        promises.push(pr);
+        return pr;
+    }
+
     #genCbFuncVld (elms, event) {
         const fc = this;
         const resArray = [];
@@ -395,27 +419,29 @@ export class FCForm extends FCBase {
 
     #setMessage (elm, result) {
         const isInvalid = result.isInvalid;
+        const className = isInvalid ? 'invalid' : 'valid';
+
+        const classList = elm.classList;
+        classList.remove('invalid', 'valid');
+        classList.add(className);
+
+        if (FCBase.regexTypeCR.test(elm.type)) {
+            elm.form.querySelectorAll(`[name=${elm.name}]`).forEach(elm => {
+                const parentClassList = elm.parentNode.classList;
+                parentClassList.remove('invalid', 'valid');
+                parentClassList.add(className);    
+            });
+        }
+
         if (this.#useWarnElm) {
             const elmWarning = this.#getElmWarnig(elm);
             const clElmWarning = elmWarning.classList;
-            const clElm = elm.classList;
             clElmWarning.remove('invalid', 'valid');
-            clElm.remove('invalid', 'valid');
-    
-            elmWarning.innerHTML = '';
-    
-            const className = isInvalid ? 'invalid' : 'valid';
             clElmWarning.add(className);
-            clElm.add(className);
+            elmWarning.innerHTML = '';
+
             if (isInvalid) {
                 elmWarning.appendChild(document.createTextNode(result.message));
-            }
-            if (FCBase.regexTypeCR.test(elm.type)) {
-                elm.form.querySelectorAll(`[name=${elm.name}]`).forEach(elm => {
-                    const parentClassList = elm.parentNode.classList;
-                    parentClassList.remove('invalid', 'valid');
-                    parentClassList.add(className);    
-                });
             }
         } else if (isInvalid) {
             elm.setCustomValidity(result.message);
