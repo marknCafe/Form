@@ -323,10 +323,6 @@ export class FCForm extends FCBase {
             return this.#taskValidation.get(elm.name);
         }
 
-        if ((this.#noUseMessage || noUseMessage) == false) {
-            this.#setMessage(elm, '');
-        }
-
         if (elm.name in this.#forcedValidation) {
             this.#forcedValidation[elm.name]
             .forEach(key => {
@@ -347,7 +343,7 @@ export class FCForm extends FCBase {
         try {
             const result = await this.#getCustomMessage(elm, event);
             if ((this.#noUseMessage || noUseMessage) == false) {
-                this.#setMessage(elm, result.message);
+                this.#setMessage(elm, result);
             }
             this.#taskValidation.set(elm.name, null);
             return result;
@@ -397,32 +393,32 @@ export class FCForm extends FCBase {
         }
     }
 
-    #setMessage (elm, message) {
-        const elmWarning = this.#getElmWarnig(elm);
-        const clElmWarning = elmWarning.classList;
-        const clElm = elm.classList;
-        clElmWarning.remove('invalid', 'valid');
-        clElm.remove('invalid', 'valid');
-        const isInvalid = message != null;
+    #setMessage (elm, result) {
+        const isInvalid = result.isInvalid;
         if (this.#useWarnElm) {
+            const elmWarning = this.#getElmWarnig(elm);
+            const clElmWarning = elmWarning.classList;
+            const clElm = elm.classList;
+            clElmWarning.remove('invalid', 'valid');
+            clElm.remove('invalid', 'valid');
+    
             elmWarning.innerHTML = '';
+    
+            const className = isInvalid ? 'invalid' : 'valid';
+            clElmWarning.add(className);
+            clElm.add(className);
             if (isInvalid) {
-                clElmWarning.add('invalid');
-                clElm.add('invalid');
-                elmWarning.appendChild(document.createTextNode(message));
-            } else {
-                clElmWarning.add('valid');
-                clElm.add('valid');
+                elmWarning.appendChild(document.createTextNode(result.message));
             }
             if (FCBase.regexTypeCR.test(elm.type)) {
                 elm.form.querySelectorAll(`[name=${elm.name}]`).forEach(elm => {
                     const parentClassList = elm.parentNode.classList;
                     parentClassList.remove('invalid', 'valid');
-                    parentClassList.add(isInvalid ? 'invalid' : 'valid');    
+                    parentClassList.add(className);    
                 });
             }
         } else if (isInvalid) {
-            elm.setCustomValidity(message);
+            elm.setCustomValidity(result.message);
             elm.reportValidity();
         }
     }
