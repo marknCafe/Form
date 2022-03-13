@@ -178,7 +178,10 @@ export class FCForm extends FCBase {
     static #genCbfunc () {
         return (event, fc) => {
             if (FCForm.#D) { console.log(`${event.type} : ${event.currentTarget.name}`); }
-            fc.validation(event.currentTarget, false, event)
+            const pr = fc.validation(event.currentTarget, false, event);
+            const timer = new FCPromiseTimer(this.promiseTimeoutMiriSec, [pr], event.type);
+            timer.start();
+            pr.then(() => { timer.clear(); })
             .catch(result => fc.#cbfCatchValidPromise(result, `${event.type}Event`) );
         };
     }
@@ -194,8 +197,11 @@ export class FCForm extends FCBase {
             }
             timer = new FCTimer(() => {
                 timer = undefined;
-                fc.validation(elm, false, event)
-                .then(result => {
+                const pr = fc.validation(elm, false, event);
+                const pTimer = new FCPromiseTimer(this.promiseTimeoutMiriSec, [pr], event.type);
+                pTimer.start();
+                pr.then(result => {
+                    pTimer.clear();
                     if (elm.classList.contains('notrim')) { return; }
                     const regexSpace = /(?:^\s+|\s+$)/;
                     if (regexSpace.test(elm.value)) {
@@ -259,7 +265,7 @@ export class FCForm extends FCBase {
             if (iteData.done) { return true; }
             try {
                 const result = await fc.validation(iteData.value, false, event);
-                if (result.value.isInvalid) {
+                if (result.isInvalid) {
                     if (FCForm.#D) { console.log(resArray); }
                     return false;
                 }
@@ -275,7 +281,11 @@ export class FCForm extends FCBase {
 
     testElm (elm, event) {
         const fc = this;
-        return fc.validation(elm, true, event);
+        const pr = fc.validation(elm, true, event);
+        const timer = new FCPromiseTimer(this.promiseTimeoutMiriSec, [pr], 'testElm');
+        timer.start();
+        pr.then(() => { timer.clear(); });
+        return pr;
     }
 
     test (event) {
@@ -320,7 +330,10 @@ export class FCForm extends FCBase {
         if (elm.name in this.#forcedValidation) {
             this.#forcedValidation[elm.name]
             .forEach(key => {
-                this.validation(this.querySelector(`[name=${key}]`), noUseMessage, event)
+                const pr = this.validation(this.querySelector(`[name=${key}]`), noUseMessage, event);
+                const timer = new FCPromiseTimer(this.promiseTimeoutMiriSec, [pr], 'forcedValidation');
+                timer.start();
+                pr.then(() => { timer.clear(); })
                 .catch(result => this.#cbfCatchValidPromise(result, 'forcedValidation') );
             });
         }
