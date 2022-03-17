@@ -20,28 +20,34 @@
 	+   [`promiseTimeout` (get/set)](#promiseTimeout)
 	+  [promiseTimeoutMiriSec (get)](#promiseTimeoutMiriSec)
 * [Instance methods](#Instance_methods)
-	+  view
-	+  hide
-	+  getFormData
-	+  addItem
-	+  getItem
-	+  keys
-	+  values
-	+  entries
-	+  has
-	+  forEach
-	+  getValues
-	+  isEmpty
-	+  clearValue
-	+  clearValues
-	+  getCollectedFormData
-	+  querySelector
-	+  querySelectorAll
-	+  addEventList
-	+  removeEventList
-	+  addEventFormItem
+	+  [view](#view)
+	+  [hide](#hide)
+	+  [getFormData](#getFormData)
+	+  [addItem](#addItem)
+	+  [getItem](#getItem)
+	+  [keys](#keys)
+	+  [values](#values)
+	+  [entries](#entries)
+	+  [has](#has)
+	+  [forEach](#forEach)
+	+ [getValues](#getValues)
+	+  [isEmpty](#isEmpty)
+	+  [clearValue](#clearValue)
+	+  [clearValues](#clearValues)
+	+  [getCollectedFormData](#getCollectedFormData)
+	+  [querySelector](#querySelector)
+	+  [querySelectorAll](#querySelectorAll)
+	+  [addEventList](#addEventList)
+	+  [removeEventList](#removeEventList)
+	+  [addEventFormItem](#addEventFormItem)
 
 ### Overview<span id="Overview"></span>
+  
+FCBaseはインスタンス生成時受け取ったHTMLFormElementとその親要素、内包するFormコントロールに対して次の様な管理を行います。
+
+* フォームの表示、非表示。表示/非表示の前後でコールバック関数を実行することができます。([`view`](#view), [`hide`](#hide), [`addEventList`](#addEventList))
+* Formコントロールの値へのアクセスを容易にします。()
+* 各Formコントロールに共通するイベントハンドラ(`blur`, `click`, `input`, `keydown`)を容易に追加できます。
   
 ### Static properties<span id="Static_properties"></span>
  
@@ -101,7 +107,7 @@
 
 #### querySelectorAll<span id="querySelectorAll"></span>
 
-#### addEventList<span id="querySelectorAll"></span>
+#### addEventList<span id="addEventList"></span>
 
 #### removeEventList<span id="removeEventList"></span>
 
