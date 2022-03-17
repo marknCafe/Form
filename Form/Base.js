@@ -105,11 +105,6 @@ export class FCBase {
     set enabledSubmit (bool) {
         this.#enabledSubmit = bool ? true : false;
     }
-    get enabledSubmit () { return this.#enabledSubmit; }
-    get onblurOuter () { return this.#onblurOuter; }
-    get onclickOuter () { return this.#onclickOuter; }
-    get oninputOuter () { return this.#oninputOuter; }
-    get onkeydownOuter () { return this.#onkeydownOuter; }
     set callbackFnView (func = parentNode => {}) {
         if (func instanceof Function == false) { throw new TypeError('callbackFnView'); }
         this.#view = func;
@@ -146,7 +141,17 @@ export class FCBase {
 
     /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     /* 入力要素管理関連 */
-    addItem (elm) { this.#list.addItem(elm); }
+    addItem (elm) {
+        if (this.#list.addItem(elm) == false) {
+            return false;
+        }
+        this.addEventFormItem(elm.name, {
+            blur : this.#onblurOuter,
+            click : this.#onclickOuter,
+            input : this.#oninputOuter,
+            keydown : this.#onkeydownOuter
+        });
+    }
     getItem (name) { return this.#list.getItem(name); }
     keys () { return this.#list.keys(); }
     values () { return this.#list.values(); }
