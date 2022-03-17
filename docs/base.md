@@ -2,6 +2,7 @@
 
 ## FCBase
 
+(作成中...)  
 `HTMLFormElement`を管理するクラスです。詳細な機能は、子クラスの　[`FCForm`](fcform.md)や[`FCConfirm`](confirm.md)で実装しています。
 
 ### Table of contents
