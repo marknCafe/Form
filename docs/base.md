@@ -62,21 +62,33 @@ FCBaseはインスタンス生成時受け取ったHTMLFormElementとその親�
 
 コンストラクタでFCBaseオブジェクトを生成します。
 
-##### Syntax
+#### Syntax
 
 ```JavaScript
 new FCBase(parentNode)
 ```
 
-##### Parameters
+#### Parameters
 
-`parentNode`  
-: HTMLFormElementの親要素。
+`parentNode`
 
+* 管理したいHTMLFormElementの親要素。
 
 ### Instance properties<span id="Instance_properties"></span>
 
 #### form (get)<span id="form"></span>
+
+HTMLFormElementを取得します。
+
+#### Syntax
+
+```JavaScript
+const elm = fm.form;
+```
+
+#### Return value
+
+HTMLFormElement
 
 #### parentNode (get)<span id="parentNode"></span>
 
