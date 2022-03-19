@@ -13,54 +13,73 @@
 * [Constructor](#Constructor)
 * [Instance properties](#Instance_properties)
  	+ [`form` (get)](#form)
-	+  [`parentNode` (get)](#parentNode)
-	+  [`enabledsubmit` (get/set)](#enabledsubmit)
-	+   [`callbackFnView` (set)](#callbackFnView)
-	+  [`callbackFnHide` (set)](#callbackFnHide)
-	+   [`promiseTimeout` (get/set)](#promiseTimeout)
-	+  [promiseTimeoutMiriSec (get)](#promiseTimeoutMiriSec)
+	+ [`parentNode` (get)](#parentNode)
+	+ [`enabledsubmit` (get/set)](#enabledsubmit)
+	+ [`callbackFnView` (set)](#callbackFnView)
+	+ [`callbackFnHide` (set)](#callbackFnHide)
+	+ [`promiseTimeout` (get/set)](#promiseTimeout)
+	+ [promiseTimeoutMiriSec (get)](#promiseTimeoutMiriSec)
 * [Instance methods](#Instance_methods)
-	+  [view](#view)
-	+  [hide](#hide)
-	+  [getFormData](#getFormData)
-	+  [addItem](#addItem)
-	+  [getItem](#getItem)
-	+  [keys](#keys)
-	+  [values](#values)
-	+  [entries](#entries)
-	+  [has](#has)
-	+  [forEach](#forEach)
+	+ [view](#view)
+	+ [hide](#hide)
+	+ [getFormData](#getFormData)
+	+ [addItem](#addItem)
+	+ [getItem](#getItem)
+	+ [keys](#keys)
+	+ [values](#values)
+	+ [entries](#entries)
+	+ [has](#has)
+	+ [forEach](#forEach)
 	+ [getValues](#getValues)
-	+  [isEmpty](#isEmpty)
-	+  [clearValue](#clearValue)
-	+  [clearValues](#clearValues)
-	+  [getCollectedFormData](#getCollectedFormData)
-	+  [querySelector](#querySelector)
-	+  [querySelectorAll](#querySelectorAll)
-	+  [addEventList](#addEventList)
-	+  [removeEventList](#removeEventList)
-	+  [addEventFormItem](#addEventFormItem)
+	+ [isEmpty](#isEmpty)
+	+ [clearValue](#clearValue)
+	+ [clearValues](#clearValues)
+	+ [setValue](#setValue)
+	+ [setValues](#setValue)
+	+ [getCollectedFormData](#getCollectedFormData)
+	+ [querySelector](#querySelector)
+	+ [querySelectorAll](#querySelectorAll)
+	+ [addEventList](#addEventList)
+	+ [removeEventList](#removeEventList)
+	+ [addEventFormItem](#addEventFormItem)
 
 ### Overview<span id="Overview"></span>
   
 FCBaseはインスタンス生成時受け取ったHTMLFormElementとその親要素、内包するFormコントロールに対して次の様な管理を行います。
 
 * フォームの表示、非表示。表示/非表示の前後でコールバック関数を実行することができます。([`view`](#view), [`hide`](#hide), [`addEventList`](#addEventList))
-* Formコントロールの値へのアクセスを容易にします。()
-* 各Formコントロールに共通するイベントハンドラ(`blur`, `click`, `input`, `keydown`)を容易に追加できます。
+* Formコントロールの値へのアクセスを容易にします。([`getValues`](#getValues), [`setValue`](#setValue), [`setValues`](#setValues))
+* Formコントロールを要素とするイテレータを利用できます。([`keys`](#keys), [`values`](#values), [`entries`](#entries), [`forEach`](#forEach))
+* 各Formコントロールに共通するイベントハンドラ(`blur`, `click`, `input`, `keydown`)を容易に追加・削除できます。([`addEventList`](#addEventList), [`removeEventList`](#removeEventList))
   
 ### Static properties<span id="Static_properties"></span>
- 
- #### regexTypeCR (get)<span id="regexTypeCR"></span>
- 
- ### Constructor<span id="Constructor"></span>
- 
- ### Instance properties<span id="Instance_properties"></span>
- 
- #### form (get)<span id="form"></span>
- 
- #### parentNode (get)<span id="parentNode"></span>
- 
+
+#### regexTypeCR (get)<span id="regexTypeCR"></span>
+
+要削除検討
+
+### Constructor<span id="Constructor"></span>
+
+コンストラクタでFCBaseオブジェクトを生成します。
+
+##### Syntax
+
+```JavaScript
+new FCBase(parentNode)
+```
+
+##### Parameters
+
+`parentNode`  
+: HTMLFormElementの親要素。
+
+
+### Instance properties<span id="Instance_properties"></span>
+
+#### form (get)<span id="form"></span>
+
+#### parentNode (get)<span id="parentNode"></span>
+
 #### enabledsubmit (get/set)<span id="enabledsubmit"></span>
 
 ####  callbackFnView (set)<span id="callbackFnView"></span>
@@ -100,6 +119,10 @@ FCBaseはインスタンス生成時受け取ったHTMLFormElementとその親�
 #### clearValue<span id="clearValue"></span>
 
 #### clearValues<span id="clearValues"></span>
+
+#### setValue<span id="setValue"></span>
+
+#### setValues<span id="setValues"></span>
 
 #### getCollectedFormData<span id="getCollectedFormData"></span>
 
