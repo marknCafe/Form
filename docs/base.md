@@ -8,8 +8,6 @@
 ## Table of contents
 
 * [Overview](#Overview)
-* [Static properties](#Static_properties)
-	+ [`regexTypeCR` (get)](#regexTypeCR)
 * [Constructor](#Constructor)
 * [Properties](#Properties)
  	+ [`form` (get)](#form)
@@ -18,7 +16,6 @@
 	+ [`callbackFnView` (set)](#callbackFnView)
 	+ [`callbackFnHide` (set)](#callbackFnHide)
 	+ [`promiseTimeout` (get/set)](#promiseTimeout)
-	+ [`promiseTimeoutMiriSec` (get)](#promiseTimeoutMiriSec)
 * [Methods](#Methods)
 	+ [view](#view)
 	+ [hide](#hide)
@@ -55,14 +52,6 @@ FCBaseはインスタンス生成時受け取ったHTMLFormElementとその親�
 * 各Formコントロールに共通するイベントハンドラ(`blur`, `click`, `input`, `keydown`)を容易に追加・削除できます。([`addEventList`](#addEventList), [`removeEventList`](#removeEventList))
 * 本クラスを通して登録したsubmitイベントは全て`Promise`を利用して管理しています。
 * submitイベント処理の期限時間を設定し、時間内に処理できない場合の処理ができるようになっています。([`promiseTimeout`](#promiseTimeout))
-
----
-
-## Static properties<span id="Properties"></span>
-
-## regexTypeCR (get)<span id="regexTypeCR"></span>
-
-要削除検討
 
 ---
 
@@ -143,12 +132,6 @@ fc.callbackFnHide = (parentNode) => { // 引数としてFormの親要素が渡�
 
 ---
 
-## promiseTimeoutMiriSec (get)<span id="promiseTimeoutMiriSec"></span>
-
-要削除検討
-
----
-
 ## Methods<span id="Methods"></span>
 
 ## view<span id="view"></span>
@@ -167,7 +150,7 @@ fc.view();
 
 ---
 
-#### hide<span id="hide"></span>
+## hide<span id="hide"></span>
 
 [`callbackFnHide`](#callbackHide)で設定したコールバック関数を実行します。
 
@@ -183,7 +166,7 @@ fc.hide();
 
 ---
 
-#### getFormData<span id="getFormData"></span>
+## getFormData<span id="getFormData"></span>
 
 `HTMLFormElement`に属するFormコントロールの値を`FormData`オブジェクトで取得します。
 
@@ -199,7 +182,7 @@ fc.getFormData();
 
 ---
 
-#### addItem<span id="addItem"></span>
+## addItem<span id="addItem"></span>
 
 `HTMLFormElement`に内包するFormコントロールを登録します。 
 
@@ -235,7 +218,7 @@ Formコントロールの登録と同時に[`addFormEvent`](#addFormEvent)で登
 
 ---
 
-#### getItem<span id="getItem"></span>
+## getItem<span id="getItem"></span>
 
 登録したFormコントロールの`NodeList`を返します。
 
