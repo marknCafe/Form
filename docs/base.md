@@ -262,40 +262,67 @@ fn.keys();
 
 #### values<span id="values"></span>
 
+登録したFormコントロールのnodeListで構成した`Iterator`オブジェクト、または`getValue`メソッドの結果の集合で構成した`Iterator`オブジェクトを返します。
+
 ### Syntax
 
 ``` JavaScript
+fn.values(getValue);
 ```
 
 ### Parameters
 
+`getValue`
+
+* Bool値。初期値は`False`。`True`は`getValue`メソッドの結果で構成した`Iterator`オブジェクト、`False`はnodeListで構成した`Iterator`オブジェクトを指定。
+
 ### Return value
+
+`Iterator`オブジェクト。
 
 ---
 
 #### entries<span id="entries"></span>
 
+name属性とnodeListまたは`getValue`メソッドの結果のペアで構成した`Iterator`オブジェクトを返します。
+
 ### Syntax
 
 ``` JavaScript
+fn.entries(getValue);
 ```
 
 ### Parameters
 
+`getValue`
+
+* Bool値。初期値は`False`。`True`name属性と`getValue`メソッドの結果のペア、`False`はname属性とnodeListのペアを指定。
+
 ### Return value
+
+`Iterator`オブジェクト。
 
 ---
 
 #### has<span id="has"></span>
 
+Formコントロールの集合に指定
+
 ### Syntax
 
 ``` JavaScript
+fn.has(name)
 ```
 
 ### Parameters
 
+`name`
+
+* name属性
+
 ### Return value
+
+Bool値を返す。`True`は要素が存在し、`False`は存在しない。
 
 ---
 
@@ -304,91 +331,194 @@ fn.keys();
 ### Syntax
 
 ``` JavaScript
+fn.forEach(fbFn[, getValue]);
 ```
 
 ### Parameters
 
+`cbFn`
+
+* ループ時に実行するコールバック関数。コールバック関数にはname属性とnodeList、またはname属性とg`getValue`メソッドの結果が渡される。
+
+`getValue`
+
+* Bool値。初期値は`False`。`True`name属性と`getValue`メソッドの結果のペア、`False`はname属性とnodeListのペアを指定。
+
 ### Return value
+
+`undefined`
+
+###
+
+``` Javascript
+fn.forEach((name, nodeList) => {
+	nodeList.forEach(node => { /* 処理 */});
+}); // 第２引数をFalseか何も渡さないとコールバック関数への引数はname, nodeList
+fn.forEach((naem, values) => {
+	/* ループ処理 */
+}, true); // 第２引数にTrueを渡すとコールバック関数への引数はname, value
+```
 
 ---
 
 #### getValues<span id="getValues"></span>
 
+指定したnameのFormコントロールの入力値、または選択された値を返します。存在しないnameを指定した場合は`FCNotExistsExeption`が`Throw`されます。
+
 ### Syntax
 
 ``` JavaScript
+fn.getValues(name);
 ```
 
 ### Parameters
 
+`name`
+
+* 登録したFormコントロールのname属性
+
 ### Return value
+
+`Array`オブジェクト。指定したnameの要素数に関わらず`Array`オブジェクトに値を格納して返します。
 
 ---
 
 #### isEmpty<span id="isEmpty"></span>
 
+指定したnameのFormコントロールに値が入力されていない、選択されていないかの確認結果を返します。存在しないnameを指定した場合は`FCNotExistsExeption`が`Throw`されます。
+
 ### Syntax
 
 ``` JavaScript
+fn.isEmpty(name);
 ```
 
 ### Parameters
 
+`name`
+
+* 登録したFormコントロールのname属性
+
 ### Return value
+
+Bool値。`True`は未入力または未選択。`False`は入力済みまたは選択済み。  
+（注意）値または選択の有無の確認だけであり、有効検査ではありません。
 
 ---
 
 #### clearValue<span id="clearValue"></span>
 
+指定したnameのFormコントロールの入力値を削除、または選択状態を解除します。存在しないnameを指定した場合は`FCNotExistsExeption`が`Throw`されます。
+
 ### Syntax
 
 ``` JavaScript
+fn.clearValue(name);
 ```
 
 ### Parameters
 
+`name`
+
+* 登録したFormコントロールのname属性
+
 ### Return value
+
+`undefined`
 
 ---
 
 #### clearValues<span id="clearValues"></span>
 
+登録しているすべてのFormコントロールの入力値を削除、または選択状態を解除します。  
+（注意）`input type="hidden"`の値も削除します。ブラウザ等画面の目視では気づけないので考慮が必要です。
 
 ### Syntax
 
 ``` JavaScript
+fn.clearValues();
 ```
 
-### Parameters
-
 ### Return value
+
+`undefiend`
 
 ---
 
 #### setValue<span id="setValue"></span>
 
+指定したnameのFormコントロールのvlaue属性に値を代入またはcheckedにします。
+
 ### Syntax
 
 ``` JavaScript
+fn.setValue(naem, value);
+fn.setvalue(name, values);
 ```
 
 ### Parameters
 
+`name`
+
+* 登録したFormコントロールのname属性
+
+`value`
+
+* 代入したい値、またはcheckedにしたいFormコントロールのvalue属性値。
+
+`values`
+
+* checkedにしたいFormコントロールのvalue属性値で構成した`Array`オブジェクト。  
+  テキストボックスや短項目選択式のFormコントロールでは配列の最後の要素が反映されます。
+
 ### Return value
+
+`undefined`
 
 ---
 
 #### setValues<span id="setValues"></span>
 
+登録したすべてのFormコントロールに対してvalue属性に値の代入またはcheckedにします。
 
 ### Syntax
 
 ``` JavaScript
+fn.setValues(formData);
+fn.setValues(map);
+fn.setValues(obj);
 ```
 
 ### Parameters
 
+`formData`
+
+* `FormData`オブジェクト
+
+`map`
+
+* `Map`オブジェクト。
+
+`obj`
+
+* `Object`。
+
 ### Return value
+
+`undefined`
+
+### Description
+
+引数の`Map`,`Object`の値は文字列または数値のプリミティブ値、またはその要素で構成された`Array`オブジェクトに対応しています。  
+登録したFormコントロールに対しての情報が引数に入っていない場合、空値で更新します。
+
+### Examples
+
+``` JavaScript
+console.dir([...fn.entries(true)]); // [ ['a', [1]], ['b', [2]], ['c', [3]] ]
+fn.setValues({a: 4, c : [5, 6]});
+console.dir([...fn.entries(true)]); // [ ['a', [4]], ['b', ['']], ['c', [6]] ]
+```
 
 ---
 
