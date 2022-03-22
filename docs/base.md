@@ -168,7 +168,7 @@ fc.hide();
 
 ## getFormData<span id="getFormData"></span>
 
-`HTMLFormElement`に属するFormコントロールの値を`FormData`オブジェクトで取得します。
+`HTMLFormElement`に属するFormコントロールの値を`FormData`オブジェクトで取得します。 `new FormData(form)`と等価です。
 
 ### Syntax
 
@@ -189,7 +189,7 @@ fc.getFormData();
 ### Syntax
 
 ``` JavaScript
-f.caddItem(element);
+fc.caddItem(element);
 ```
 
 ### Parameters
@@ -210,7 +210,7 @@ Formコントロールの登録と同時に[`addFormEvent`](#addFormEvent)で登
 | --- | --- |
 | 登録可能な要素共通 | blur |
 | `<input type="(checkbox,radio)">`, <br>  `<select>` | click |
-| `<input type="(email,number,password,range,search,tel,text,url)">` | keydown, input |
+| `<input type="(email,number,password,range,search,tel,text,url)">`, <br> `<textarea>` | keydown, input |
 
 `FCBase`オブジェクトを生成する時点で本メソッドと同様の処理を実行するため通常は使用しません。  
 `FCBase`オブジェクトを生成した後に追加したFormコントロールがあるときに使用します。  
@@ -244,14 +244,14 @@ fc.getItem(name);
 
 ---
 
-#### keys<span id="keys"></span>
+## keys<span id="keys"></span>
 
 登録したFormコントロールの`name`属性値で構成した`Iterator`オブジェクトを返します。
 
 ### Syntax
 
 ``` JavaScript
-fn.keys();
+fc.keys();
 ```
 
 ### Return value
@@ -260,14 +260,14 @@ fn.keys();
 
 ---
 
-#### values<span id="values"></span>
+## values<span id="values"></span>
 
 登録したFormコントロールのnodeListで構成した`Iterator`オブジェクト、または`getValue`メソッドの結果の集合で構成した`Iterator`オブジェクトを返します。
 
 ### Syntax
 
 ``` JavaScript
-fn.values(getValue);
+fc.values(getValue);
 ```
 
 ### Parameters
@@ -282,14 +282,14 @@ fn.values(getValue);
 
 ---
 
-#### entries<span id="entries"></span>
+## entries<span id="entries"></span>
 
 name属性とnodeListまたは`getValue`メソッドの結果のペアで構成した`Iterator`オブジェクトを返します。
 
 ### Syntax
 
 ``` JavaScript
-fn.entries(getValue);
+fc.entries(getValue);
 ```
 
 ### Parameters
@@ -304,14 +304,14 @@ fn.entries(getValue);
 
 ---
 
-#### has<span id="has"></span>
+## has<span id="has"></span>
 
 Formコントロールの集合に指定
 
 ### Syntax
 
 ``` JavaScript
-fn.has(name)
+fc.has(name)
 ```
 
 ### Parameters
@@ -326,12 +326,12 @@ Bool値を返す。`True`は要素が存在し、`False`は存在しない。
 
 ---
 
-#### forEach<span id="forEach"></span>
+## forEach<span id="forEach"></span>
 
 ### Syntax
 
 ``` JavaScript
-fn.forEach(fbFn[, getValue]);
+fc.forEach(fbFn[, getValue]);
 ```
 
 ### Parameters
@@ -351,24 +351,24 @@ fn.forEach(fbFn[, getValue]);
 ###
 
 ``` Javascript
-fn.forEach((name, nodeList) => {
+fc.forEach((name, nodeList) => {
 	nodeList.forEach(node => { /* 処理 */});
 }); // 第２引数をFalseか何も渡さないとコールバック関数への引数はname, nodeList
-fn.forEach((naem, values) => {
+fc.forEach((naem, values) => {
 	/* ループ処理 */
 }, true); // 第２引数にTrueを渡すとコールバック関数への引数はname, value
 ```
 
 ---
 
-#### getValues<span id="getValues"></span>
+## getValues<span id="getValues"></span>
 
 指定したnameのFormコントロールの入力値、または選択された値を返します。存在しないnameを指定した場合は`FCNotExistsExeption`が`Throw`されます。
 
 ### Syntax
 
 ``` JavaScript
-fn.getValues(name);
+fc.getValues(name);
 ```
 
 ### Parameters
@@ -383,14 +383,14 @@ fn.getValues(name);
 
 ---
 
-#### isEmpty<span id="isEmpty"></span>
+## isEmpty<span id="isEmpty"></span>
 
 指定したnameのFormコントロールに値が入力されていない、選択されていないかの確認結果を返します。存在しないnameを指定した場合は`FCNotExistsExeption`が`Throw`されます。
 
 ### Syntax
 
 ``` JavaScript
-fn.isEmpty(name);
+fc.isEmpty(name);
 ```
 
 ### Parameters
@@ -406,14 +406,14 @@ Bool値。`True`は未入力または未選択。`False`は入力済みまたは
 
 ---
 
-#### clearValue<span id="clearValue"></span>
+## clearValue<span id="clearValue"></span>
 
 指定したnameのFormコントロールの入力値を削除、または選択状態を解除します。存在しないnameを指定した場合は`FCNotExistsExeption`が`Throw`されます。
 
 ### Syntax
 
 ``` JavaScript
-fn.clearValue(name);
+fc.clearValue(name);
 ```
 
 ### Parameters
@@ -428,7 +428,7 @@ fn.clearValue(name);
 
 ---
 
-#### clearValues<span id="clearValues"></span>
+## clearValues<span id="clearValues"></span>
 
 登録しているすべてのFormコントロールの入力値を削除、または選択状態を解除します。  
 （注意）`input type="hidden"`の値も削除します。ブラウザ等画面の目視では気づけないので考慮が必要です。
@@ -436,7 +436,7 @@ fn.clearValue(name);
 ### Syntax
 
 ``` JavaScript
-fn.clearValues();
+fc.clearValues();
 ```
 
 ### Return value
@@ -445,15 +445,15 @@ fn.clearValues();
 
 ---
 
-#### setValue<span id="setValue"></span>
+## setValue<span id="setValue"></span>
 
 指定したnameのFormコントロールのvlaue属性に値を代入またはcheckedにします。
 
 ### Syntax
 
 ``` JavaScript
-fn.setValue(naem, value);
-fn.setvalue(name, values);
+fc.setValue(naem, value);
+fc.setvalue(name, values);
 ```
 
 ### Parameters
@@ -477,16 +477,16 @@ fn.setvalue(name, values);
 
 ---
 
-#### setValues<span id="setValues"></span>
+## setValues<span id="setValues"></span>
 
 登録したすべてのFormコントロールに対してvalue属性に値の代入またはcheckedにします。
 
 ### Syntax
 
 ``` JavaScript
-fn.setValues(formData);
-fn.setValues(map);
-fn.setValues(obj);
+fc.setValues(formData);
+fc.setValues(map);
+fc.setValues(obj);
 ```
 
 ### Parameters
@@ -515,79 +515,168 @@ fn.setValues(obj);
 ### Examples
 
 ``` JavaScript
-console.dir([...fn.entries(true)]); // [ ['a', [1]], ['b', [2]], ['c', [3]] ]
-fn.setValues({a: 4, c : [5, 6]});
-console.dir([...fn.entries(true)]); // [ ['a', [4]], ['b', ['']], ['c', [6]] ]
+console.dir([...fc.entries(true)]); // [ ["a", ["1"]], ["b", ["2"]], ["c", ["3"]] ] // 前提として'c'はcheckboxとします。
+fc.setValues({a: 4, c : [5, 6]});
+console.dir([...fc.entries(true)]); // [ ["a", ["4"]], ["b", [""]], ["c", ["5", "6"]] ]
 ```
 
 ---
 
-#### getCollectedFormData<span id="getCollectedFormData"></span>
+## getCollectedFormData<span id="getCollectedFormData"></span>
+
+登録した全てのFormコントロールの値で構成する`FormData`オブジェクトを返します。 FCBaseオブジェクトを生成したのちにFormコントロールを追加したが`addItem`で追加していない、Formコントロールのclass属性に"exclude"を持ちFCBaseオブジェクトに登録されていない場合は`FormData`に反映されません。
 
 ### Syntax
 
 ``` JavaScript
+fm.getCollectedFormData();
 ```
-
-### Parameters
 
 ### Return value
 
+`FormData`オブジェクト。
+
 ---
 
-#### querySelector<span id="querySelector"></span>
+## querySelector<span id="querySelector"></span>
+
+HTMLFormElementの親要素の`querySelector`を実行します。
 
 ### Syntax
 
 ``` JavaScript
+fc.querySelector(selectors);
 ```
 
 ### Parameters
 
+`selectors`
+
+* CSSセレクター文字列
+
 ### Return value
+
+`selectors`に一致するする最初のElementオブジェクト。一致しない場合は`null`を返します。
 
 ---
 
-#### querySelectorAll<span id="querySelectorAll"></span>
+## querySelectorAll<span id="querySelectorAll"></span>
+
+HTMLFormElementの親要素の`querySelectorAll`を実行します。
 
 ### Syntax
 
 ``` JavaScript
+fc.querySelectorAll(selectors);
 ```
 
 ### Parameters
 
+`selectors`
+
+* CSSセレクター文字列
+
 ### Return value
+
+`selectors`に一致する要素を含む静的な`NodeList`。一致しない場合は空の`NodeList`。
 
 ---
 
-#### addEventList<span id="addEventList"></span>
+## addEventList<span id="addEventList"></span>
+
+FCBaseクラスで管理するイベントハンドラー内で実行する関数を登録します。
 
 ### Syntax
 
 ``` JavaScript
+fc.addEventList(type, func);
 ```
 
 ### Parameters
 
+`type`
+
+イベントの種類を表す文字列。
+
+`func`
+
+指定したイベントが発生するときに実行する関数。
+
 ### Return value
+
+`undefined`
+
+### Description
+
+登録可能なイベントの種類と関係する要素は次の通りです。
+
+| イベントの種類 | 関係する要素、オブジェクト | 説明 |
+| ---- | ---- | ---- |
+| blur | Formコントロール |  |
+| click | `<input type="(checkbox,radio)">`, <br> `<select>` |  |
+| input | `<input type="(email,number,password,range,search,tel,text,url)">`, <br>, `<textarea>` |  |
+| keydown | `<input type="(email,number,password,range,search,tel,text,url)">`, <br>, `<textarea>` |  |
+| error | `window`オブジェクト |  |
+| submit | `fc.form` |  |
+| afterSubmit | `fc.form` | 上記submitイベント実行後に呼び出されます |
+| beforeView | `fc.parentNode` | `fc.parentNode`が表示される直前に呼び出されます |
+| afterView | `fc.parentNode` | `fc.parentNode`が表示された直後に呼び出されます |
+| beforeHide | `fc.parentNode` | `fc.parentNode`が非表示になる直前に呼び出されます |
+| afterHide | `fc.parentNode` | `fc.parentNode`が非表示になった直後に呼び出されます |
+
+* `func`は`Event`オブジェクトと、`FCBase`オブジェクトを受け取れる関数にしてください。  
+```JavaScript
+fc.addEvent('blur', (event, fcObj) => { /* 何か処理 */ });
+```
+* `FCBase`は各種イベント毎に実行する関数を保持する配列を持ち、各種配列内の関数を全て実行するハンドラを関係する要素全てに登録します。
+* あるFormコントロールのみにイベントを登録したい場合は`addEventListener`を使用してください。
+* 全てのFCBaseオブジェクトで登録した`error`イベントは、一つの`window`オブジェクトの`error`イベント内で管理しています。`submit`イベント実行時のpromise timeout を除き、`error`イベントが発火したときは全てのFCBaseオブジェクトで登録した関数の実行を試みます。尚、各FCBaseオブジェクトに同一の関数を登録した場合はその内の一つのみを実行します。  
+``` JavaScript
+const func = () => { /* 何かの処理 */ };
+fc1.addEvent('erorr', func);　// error イベントで実行されるのはこの一つのみ。
+fc2.addEvent('erorr', func);　// promise timeout が発生したときは、発生した各FCBaseで登録した関数のみが実行されます。
+fc3.addEvent('erorr', func);
+```
+``` JavaScript
+const genFunc = () => { return () => { /* 何かの処理 */ }; };
+fc1.addEvent('error', genFunc()); // 処理内容は一緒でもそれぞれ別の関数オブジェクトが登録されているため、
+fc2.addEvent('error', genFunc()); // error イベントでは３つ全てを実行します。
+fc3.addEvent('error', genFunc());
+```
 
 ---
 
-#### removeEventList<span id="removeEventList"></span>
+## removeEventList<span id="removeEventList"></span>
+
+`addEventList`で登録した関数を削除します。
 
 ### Syntax
 
 ``` JavaScript
+fc.removeEventList(type, func);
 ```
 
 ### Parameters
 
+`type`
+
+イベントの種類を表す文字列。
+
+`func`
+
+`addEventList`で登録した関数。
+
 ### Return value
+
+`undefined`
+
+### Description
+
+`FCBase`オブジェクトで保持する配列中の関数の削除を試みます。 一致しない場合は特に何もしません。
 
 ---
 
-#### addEventFormItem<span id="addEventFormItem"></span>
+## addEventFormItem<span id="addEventFormItem"></span>
 
 
 ### Syntax
