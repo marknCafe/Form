@@ -4,39 +4,29 @@ import { FCTimer, FCPromiseTimer, FCTimerState } from './Utility.js';
 export { FCNotExistsExeption, FCFailedOpenIDBExeption, FCTimer, FCPromiseTimer, FCTimerState };
 
 export class FCBase {
-/* HTMLFormElementを管理するクラス。
- * Webフォームを管理するためのFCFormクラス、FCConfirmクラスの親クラスです。
- */
-    static #D = false;
-    static #DefaultCBFn (event, fc) {};
+    static #regexType = /email|number|password|range|search|tel|text|url/i;
 
-    #enabledSubmit = false; // フォームデータの送信の可否を決めるフラグ
+    #enabledSubmit = false;
     #view = parentNode => parentNode.style.display = '';
     #hide = parentNode => parentNode.style.display = 'none';
-
     #eventList = new FCEventList();
-
     #onblurOuter = undefined;
     #onclickOuter = undefined;
     #oninputOuter = undefined;
     #onkeydownOuter = undefined;
     #successedOnsubmit = false;
-
     #promiseTimeout = 30000;
     #promiseTimer = new FCPromiseTimer();
-
     #list = (() => {
         let div = document.createElement('div');
         div.appendChild(document.createElement('form'));
         return new FCElementCollection(div);
     })();
 
-    static #regexType = /email|number|password|range|search|tel|text|url/i;
-
-    constructor (elm) {
-        this.#list = new FCElementCollection(elm);
+    constructor (parentNode) {
+        this.#list = new FCElementCollection(parentNode);
         this.#eventList = new FCEventList();
-        this.#promiseTimer = undefined;
+        this.#promiseTimer = new FCPromiseTimer();
 
         this.form.addEventListener('submit', event => this.#execOnSubmit(event), false);
 
@@ -68,15 +58,13 @@ export class FCBase {
             promises.push(promise);
         });
 
-        const timer = new FCPromiseTimer();
+        const timer = this.#promiseTimer;
         timer.delay = this.#promiseTimeout;
         timer.start([promises, 'execOnSubmit']);
-        this.#promiseTimer = timer;
 
         Promise.allSettled(promises)
         .then(result => {
             timer.clear();
-            this.#promiseTimer = undefined;
             const resRejected = result.find(data => data.status == 'rejected');
             if (resRejected) {
                 throw resRejected.reason;
@@ -90,13 +78,13 @@ export class FCBase {
             }
         })
         .catch(reason => {
+            timer.clear();
             FCOnError.exec(reason);
         });
         event.preventDefault();
         return false;
     }
 
-    // アクセサ
     get form () { return this.#list.form; }
     get parentNode () { return this.#list.parentNode; }
     set enabledSubmit (bool) {
@@ -118,32 +106,29 @@ export class FCBase {
     get promiseTimeout () { return this.#promiseTimeout / 1000; }
     get promiseTimeoutMiriSec () { return this.#promiseTimeout; }
 
-    // メソッド
     view () {
-    // form要素を表示させる
         this.#eventList.beforeView.forEach((func, index) => func(this) );
         this.#view(this.#list.parentNode);
         this.#eventList.afterView.forEach((func, index) => func(this) );
     }
     hide () {
-    // form要素を非表示にする
         this.#eventList.beforeHide.forEach((func, index) => func(this) );
         this.#hide(this.#list.parentNode);
         this.#eventList.afterHide.forEach((func, index) => func(this) );
     }
-    getFormData () {
-    // form要素のデータでFormDataインスタンスを生成して返す
-        return new FormData(this.form);
-    }
+    getFormData () { return new FormData(this.form); }
 
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-    /* 入力要素管理関連 */
-    addItem (elm) {
-        if (this.#list.addItem(elm) == false) {
+    addItem (element) {
+        if (this.#list.addItem(element) == false) {
             return false;
         }
-
-        this.addEventFormItem(elm.name, {
+        this.get(element.name).forEach(elm => {
+            elm.removeEventListener('blur', this.#onblurOuter);
+            elm.removeEventListener('click', this.#onclickOuter);
+            elm.removeEventListener('input', this.#oninputOuter);
+            elm.removeEventListener('keydown', this.#onkeydownOuter);
+        });
+        this.addEventFormItem(element.name, {
             blur : this.#onblurOuter,
             click : this.#onclickOuter,
             input : this.#oninputOuter,
@@ -156,8 +141,8 @@ export class FCBase {
     values (getValue = false) { return this.#list.values(getValue); }
     entries (getValue = false) { return this.#list.entries(getValue); }
     has (name) { return this.#list.has(name); }
-    forEach (cbFunc = (vlaue, name) => { undefined; }, getValue = false) {
-        this.#list.forEach(cbFunc, getValue);
+    forEach (func, getValue = false) {
+        this.#list.forEach(func, getValue);
     }
     getValues (name) { return this.#list.getValues(name); }
     isEmpty (name) { return this.#list.isEmpty(name); }
@@ -166,11 +151,10 @@ export class FCBase {
     setValue (name, value) { this.#list.setValue(name, value); }
     setValues (data) { this.#list.setValues(data); }
     getCollectedFormData () { return this.#list.getCollectedFormData(); }
-    querySelector (query) { return this.#list.parentNode.querySelector(query); }
-    querySelectorAll(query) { return this.#list.parentNode.querySelectorAll(query); }
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-    /* イベント管理関連 */
-    addEventList (type = '', func = FCBase.#DefaultCBFn) {
+    querySelector (selectors) { return this.#list.parentNode.querySelector(selectors); }
+    querySelectorAll(selectors) { return this.#list.parentNode.querySelectorAll(selectors); }
+
+    addEventList (type = '', func) {
         this.#eventList.addEventList(type, func);
     }
     removeEventList (type = '', func) {
@@ -202,28 +186,19 @@ export class FCBase {
         });
     }
     #genCBFnBlurOuter () {
-        const fc = this;
-        return event => fc.#eventList.blurList.forEach(func => func(event, fc));
+        return event => this.#eventList.blurList.forEach(func => func(event, this));
     }
     #genCBFnClickOuter () {
-        const fc = this;
-        return event => fc.#eventList.clickList.forEach(func => func(event, fc));
+        return event => this.#eventList.clickList.forEach(func => func(event, this));
     }
     #genCBFnInputOuter () {
-        const fc = this;
-        return event => fc.#eventList.inputList.forEach(func => func(event, fc));
+        return event => this.#eventList.inputList.forEach(func => func(event, this));
     }
     #genCBFnKeydownOuter () {
-        const fc = this;
-        return event => fc.#eventList.keydownList.forEach(func => func(event, fc));
+        return event => this.#eventList.keydownList.forEach(func => func(event, this));
     }
     #initErrorEvent () {
-        this.addEventList('error', (event, fc) => {
-            if (this.#promiseTimer instanceof FCPromiseTimer) {
-                this.#promiseTimer.clear();
-                this.#promiseTimer = undefined;
-            }
-        });
+        this.addEventList('error', () => this.#promiseTimer.clear() );
     }
 }
 
@@ -256,7 +231,7 @@ export class FCEventHandlerList {
 }
 
 class FCEventList {
-    static #DefaultCBFn () {}; // (event, fc) {};
+    static #DefaultCBFunc () {};
     #list = new Map();
 
     constructor () {
@@ -288,9 +263,9 @@ class FCEventList {
     get beforeHide () { return this.#list.get(FCEventType.beforeHide); }
     get afterHide () { return this.#list.get(FCEventType.afterHide); }
 
-    addEventList (type = '', func = FCEventList.#DefaultCBFn) {
+    addEventList (type = '', func = FCEventList.#DefaultCBFunc) {
         if (func instanceof Function == false) { throw new TypeError('addEvent, func'); }
-        if (func === FCEventList.#DefaultCBFn) { throw new TypeError('addEvent, func'); }
+        if (func === FCEventList.#DefaultCBFunc) { throw new TypeError('addEvent, func'); }
         if (this.#list.has(type) == false) { throw new FCNotExistsExeption('addEventList, type'); }
         this.#list.get(type).push(func);
     }
@@ -316,24 +291,21 @@ class FCEventType {
 }
 
 class FCElementCollection {
-    static #D = false;
     static #regexTypeCR = /^checkbox|radio$/i;
     static get regexTypeCR () { return FCElementCollection.#regexTypeCR; }
     #map = new Map();
     #parentNode = undefined;
     #form = document.createElement('form');
 
-    constructor (elm) {
-        //super();
+    constructor (parentNode) {
         this.#map = new Map();
-        this.#setForm(elm);
+        this.#setForm(parentNode);
         this.#collectItem();
     }
-    #setForm (elm) {
-        // form要素をインスタンスにセットする
-        if (elm instanceof HTMLElement == false) { throw new TypeError('"elm" is not HTMLElement'); }
-        this.#parentNode = elm;
-        const elmForm = elm.querySelector('form');
+    #setForm (parentNode) {
+        if (parentNode instanceof HTMLElement == false) { throw new TypeError('"elm" is not HTMLElement'); }
+        this.#parentNode = parentNode;
+        const elmForm = parentNode.querySelector('form');
         if (elmForm instanceof HTMLFormElement == false) { throw new TypeError('FormElement is not exists.'); }
         this.#form = elmForm;
     }
@@ -346,7 +318,6 @@ class FCElementCollection {
         } else {
             nodeList = this.#form.querySelectorAll('input:not([type=submit]), textarea, select');
         }
-        if (FCElementCollection.#D && nodeList.length == 0) { console.log('There is no item.'); }
         const execludeList = [];
         nodeList.forEach((elm) => {
             const name = elm.name;
@@ -360,13 +331,13 @@ class FCElementCollection {
     get parentNode () { return this.#parentNode; }
     get form () { return this.#form; }
 
-    addItem (elm) {
-        const validElm = elm instanceof HTMLInputElement || elm instanceof HTMLSelectElement || elm instanceof HTMLTextAreaElement;
+    addItem (element) {
+        const validElm = element instanceof HTMLInputElement || element instanceof HTMLSelectElement || element instanceof HTMLTextAreaElement;
         if (validElm == false) { throw new TypeError('addItem'); }
-        const name = elm.name;
+        const name = element.name;
         if (name == '' || name == undefined) { throw new TypeError('Attribute "name" is not defined.'); }
         if (this.#map.has(name)) {
-            if ([...this.#map.get(name).values()].indexOf(elm) == -1) {
+            if ([...this.#map.get(name).values()].indexOf(element) == -1) {
                 this.#map.set(name, this.genNodeListByName(name));   
             }
             return true;
@@ -394,7 +365,7 @@ class FCElementCollection {
         if (this.#map.has(name) == false) { throw new FCNotExistsExeption('getItem'); }
         return this.#map.get(name);
     }
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
     getValues (name) {
         if (this.#map.has(name) == false) { throw new FCNotExistsExeption('getValues'); }
         const values = [];
@@ -417,7 +388,7 @@ class FCElementCollection {
     #getValsSelectElm (select) {
         const values = [];
         const collection = select.selectedOptions;
-        const ite = FCSimpleIterator.gen(collection, i => collection.item(i));
+        const ite = this.#genIteratorIndex(collection.length, i => collection.item(i));
         for (const item of ite) {
             values.push(item);
         }
@@ -483,10 +454,8 @@ class FCElementCollection {
     #setValueArray(nodeList, data) {
         data.forEach(value => this.#_setValue(nodeList, value));
     }
-    /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
     getCollectedFormData () {
-        //console.trace();
         const orgData = new FormData(this.#form);
         const data = new FormData();
         this.#map.forEach((v, name) => {
@@ -499,9 +468,9 @@ class FCElementCollection {
         });
         return data;
     }
-    forEach (cbFn, getValue = false) {
+    forEach (func, getValue = false) {
         if (getValue == false ) {
-            this.#map.forEach(cbFn);
+            this.#map.forEach(func);
         } else {
             this.#map.forEach((nodeList, name) => {
                 cbFn(this.getValues(name), name);
@@ -514,39 +483,28 @@ class FCElementCollection {
         if (getValue == false) {
             return this.#map.values();
         }
-        const fn = this;
-        return (function* () {
-            for (let name of fn.#map.keys()) {
-                yield fn.getValues(name);
-            }
-        })();
+        return this.#genIteratorKeys(
+            this.#map.keys(),
+            key => this.getValues(key)
+        );
     }
     entries (getValue = false) {
         if (getValue == false) {
             return this.#map.entries();
         }
-        const fn = this;
-        return (function* () {
-            for (let name of fn.#map.keys()) {
-                yield [name, fn.getValues(name)];
-            }
-        })();
+        return this.#genIteratorKeys(
+            this.#map.keys(),
+            key => [key, this.getValues(key)]
+        );
     }
-}
-
-class FCSimpleIterator {
-    static #dummy = new Object();
-    static gen (object = FCSimpleIterator.#dummy, getter) {
-        if (object === FCSimpleIterator.#dummy) { throw new TypeError('genIteratableFn'); }
-        if (getter instanceof Function == false) { throw new TypeError('genIteratableFn'); }
-        return FCSimpleIterator.#iteratableFn(object, getter);
-    }
-    static #iteratableFn = function* (object, getter) {
-        let i = 0;
-        while (true) {
-            if (i >= object.length) { break; }
+    #genIteratorIndex = function* (length, getter) {
+        for (let i = 0; i < length; i ++) {
             yield getter(i);
-            i ++;
+        }
+    }
+    #genIteratorKeys = function* (keys, getter) {
+        for (let key of keys) {
+            yield getter(key);
         }
     }
 }
