@@ -596,11 +596,11 @@ fc.addEventList(type, func);
 
 `type`
 
-イベントの種類を表す文字列。
+* イベントの種類を表す文字列。
 
 `func`
 
-指定したイベントが発生するときに実行する関数。
+* 指定したイベントが発生するときに実行する関数。
 
 ### Return value
 
@@ -614,8 +614,8 @@ fc.addEventList(type, func);
 | ---- | ---- | ---- |
 | blur | Formコントロール |  |
 | click | `<input type="(checkbox,radio)">`, <br> `<select>` |  |
-| input | `<input type="(email,number,password,range,search,tel,text,url)">`, <br>, `<textarea>` |  |
-| keydown | `<input type="(email,number,password,range,search,tel,text,url)">`, <br>, `<textarea>` |  |
+| input | `<input type="(email,number,password,range,search,tel,text,url)">`, <br> `<textarea>` |  |
+| keydown | `<input type="(email,number,password,range,search,tel,text,url)">`, <br> `<textarea>` |  |
 | error | `window`オブジェクト |  |
 | submit | `fc.form` |  |
 | afterSubmit | `fc.form` | 上記submitイベント実行後に呼び出されます |
@@ -660,11 +660,11 @@ fc.removeEventList(type, func);
 
 `type`
 
-イベントの種類を表す文字列。
+* イベントの種類を表す文字列。
 
 `func`
 
-`addEventList`で登録した関数。
+* `addEventList`で登録した関数。
 
 ### Return value
 
@@ -678,12 +678,46 @@ fc.removeEventList(type, func);
 
 ## addEventFormItem<span id="addEventFormItem"></span>
 
+指定したnameを持つFormコントロールに適当なイベントの種類の`addEventListener`を呼びだして登録を行います。
 
 ### Syntax
 
 ``` JavaScript
+fc.addEventFormItem(name, eventHandlerList);
 ```
 
 ### Parameters
 
+`name`
+
+* 登録したFormコントロールのname属性
+
+`eventHandlerList`
+
+* `blur`, `click`, `keydown`, `input` のキー名とコールバック関数を値にした`Object`または`FCEventHandlerList`オブジェクト。
+
 ### Return value
+
+`undefined`
+
+### Description
+
+登録できるイベントの種類と、登録に対応する要素は次の通りです。
+
+| イベントの種類 | 関係する要素 |
+| ---- | ---- |
+| blur | Formコントロール |
+| click | `<input type="(checkbox,radio)">`, <br> `<select>` |
+| input | `<input type="(email,number,password,range,search,tel,text,url)">`, <br> `<textarea>` |
+| keydown | `<input type="(email,number,password,range,search,tel,text,url)">`, <br> `<textarea>` |
+
+### Examples
+
+``` JavaScript
+/* name="clothing_size", type="radio"のinput要素にイベントを登録 */
+const list = {
+	blur () => {　/* 何か処理 */ },
+	click () => { /* 何か処理 */ }
+};
+fc.addEventFormItem('clothing_size', list);
+```
