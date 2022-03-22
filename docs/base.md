@@ -189,7 +189,7 @@ fc.getFormData();
 ### Syntax
 
 ``` JavaScript
-fc.caddItem(element);
+fc.addItem(element);
 ```
 
 ### Parameters
@@ -274,7 +274,7 @@ fc.values(getValue);
 
 `getValue`
 
-* Bool値。初期値は`False`。`True`は`getValue`メソッドの結果で構成した`Iterator`オブジェクト、`False`はnodeListで構成した`Iterator`オブジェクトを指定。
+* Bool値。省略可。初期値は`False`。`True`は`getValue`メソッドの結果で構成した`Iterator`オブジェクト、`False`はnodeListで構成した`Iterator`オブジェクトを指定。
 
 ### Return value
 
@@ -296,7 +296,7 @@ fc.entries(getValue);
 
 `getValue`
 
-* Bool値。初期値は`False`。`True`name属性と`getValue`メソッドの結果のペア、`False`はname属性とnodeListのペアを指定。
+* Bool値。省略可。初期値は`False`。`True`name属性と`getValue`メソッドの結果のペア、`False`はname属性とnodeListのペアを指定。
 
 ### Return value
 
@@ -331,18 +331,19 @@ Bool値を返す。`True`は要素が存在し、`False`は存在しない。
 ### Syntax
 
 ``` JavaScript
-fc.forEach(fbFn[, getValue]);
+fc.forEach(func);
+fc.forEach(func, getValue);
 ```
 
 ### Parameters
 
-`cbFn`
+`func`
 
-* ループ時に実行するコールバック関数。コールバック関数にはname属性とnodeList、またはname属性とg`getValue`メソッドの結果が渡される。
+* ループ時に実行するコールバック関数。コールバック関数には`NodeList`とname属性、または`getValue`メソッドの結果とname属性が渡される。
 
 `getValue`
 
-* Bool値。初期値は`False`。`True`name属性と`getValue`メソッドの結果のペア、`False`はname属性とnodeListのペアを指定。
+* Bool値。省略可。初期値は`False`。`True`は`getValue`メソッドの結果とname属性のペア、`False`は`nodeList`とname属性のペアを指定。
 
 ### Return value
 
@@ -351,10 +352,10 @@ fc.forEach(fbFn[, getValue]);
 ###
 
 ``` Javascript
-fc.forEach((name, nodeList) => {
+fc.forEach((nodeList, name) => {
 	nodeList.forEach(node => { /* 処理 */});
 }); // 第２引数をFalseか何も渡さないとコールバック関数への引数はname, nodeList
-fc.forEach((naem, values) => {
+fc.forEach((values, name) => {
 	/* ループ処理 */
 }, true); // 第２引数にTrueを渡すとコールバック関数への引数はname, value
 ```
