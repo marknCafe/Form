@@ -12,7 +12,7 @@ Webフォームのクライアントサイドの制御を簡単に行うため�
 
 Form.jsと関連するFormフォルダをWebサーバに配置して、Form.jsを利用するJavaScriptから`import`してください。
 
-## Example
+## Examples
 
 <p><a href="https://markncafe.github.io/sample/form/example.html" target="_blank">example.html</a></p>
 
@@ -138,3 +138,11 @@ form.controllerSettings({ //　内包するコントローラクラスの設定
 .start() // 機能開始。append -> addInitTaskの順にwindow.onloadイベントとして実行します。
 .then(() => { document.body.classList.remove('hidden'); }) // start()の戻り値はPromiseインスタンスなので、then catch が利用できます。
 ```
+
+上記より[もう少し作り込んだサンプル](https://markncafe.github.io/sample/form/sample.html)と、[コード](https://github.com/marknCafe/marknCafe.github.io/tree/main/sample/form)もご覧ください。
+
+## Documents
+
+Formを構成するパッケージのドキュメントです。（作成中）
+
+* [`FCBase`](docs/base.md)
